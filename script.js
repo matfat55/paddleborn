@@ -8984,42 +8984,48 @@ window.addEventListener("keydown", (e) => {
 window.addEventListener("keyup", (e) => {
 	keysDown[e.key.toLowerCase()] = false;
 });
-$("cv").addEventListener("click", () => {
+const bindClick = (id, fn) => {
+	const el = $(id);
+	if (el) el.onclick = fn;
+};
+const cvEl = $("cv");
+if (cvEl)
+	cvEl.addEventListener("click", () => {
 	if (tut && tut.active && (tut.phase === "intro" || tut.phase === "overlay")) {
 		dismissTutOverlay(null);
 		return;
 	}
 	if (!advanceFoolDialogue(g)) handleContinue();
 });
-$("go-retry").onclick = () => {
+bindClick("go-retry", () => {
 	savedState = null;
 	wave = 1;
 	enemyUps = [];
 	chosenOppCfg = null;
 	SFX.sel();
 	showOpponentSelect();
-};
-$("go-menu").onclick = () => {
+});
+bindClick("go-menu", () => {
 	savedState = null;
 	wave = 1;
 	enemyUps = [];
 	chosenOppCfg = null;
 	showScreen("menu-screen");
-};
-$("vic-again").onclick = () => {
+});
+bindClick("vic-again", () => {
 	savedState = null;
 	wave = 1;
 	enemyUps = [];
 	chosenOppCfg = null;
 	showScreen("menu-screen");
-};
-$("pause-resume").onclick = () => {
+});
+bindClick("pause-resume", () => {
 	paused = false;
 	$("pause-overlay").classList.add("hidden");
 	const skipBtn = $("pause-skip-tut");
 	if (skipBtn) skipBtn.style.display = "none";
-};
-$("pause-menu").onclick = () => {
+});
+bindClick("pause-menu", () => {
 	paused = false;
 	$("pause-overlay").classList.add("hidden");
 	g = null;
@@ -9029,13 +9035,14 @@ $("pause-menu").onclick = () => {
 	chosenOppCfg = null;
 	if (tut) { tut = null; }
 	showScreen("menu-screen");
-};
-$("pause-skip-tut").onclick = () => {
+});
+bindClick("pause-skip-tut", () => {
 	paused = false;
 	$("pause-overlay").classList.add("hidden");
-	$("pause-skip-tut").style.display = "none";
+	const skipBtn = $("pause-skip-tut");
+	if (skipBtn) skipBtn.style.display = "none";
 	skipTutorial();
-};
+});
 
 // --- DEV MODE ---
 let devPad = "classic",
@@ -9377,23 +9384,24 @@ function devLaunch() {
 	if (boss) setTimeout(SFX.boss, 80);
 }
 
-$("dev-go").onclick = () => {
+bindClick("dev-go", () => {
 	SFX.sel();
 	devLaunch();
-};
-$("dev-back").onclick = () => {
+});
+bindClick("dev-back", () => {
 	SFX.sel();
 	showScreen("menu-screen");
-};
+});
 
 // --- GAME LOOP ---
-const cv = $("cv"),
-	ctx = cv.getContext("2d");
-ctx.imageSmoothingEnabled = false;
+const cv = $("cv");
+const ctx = cv ? cv.getContext("2d") : null;
+if (ctx) ctx.imageSmoothingEnabled = false;
 let last = performance.now();
 let viewW = window.innerWidth,
 	viewH = window.innerHeight;
 function resize() {
+	if (!cv || !ctx) return;
 	viewW = window.innerWidth;
 	viewH = window.innerHeight;
 	const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -9407,6 +9415,10 @@ function resize() {
 resize();
 window.addEventListener("resize", resize);
 function loop(now) {
+	if (!ctx) {
+		requestAnimationFrame(loop);
+		return;
+	}
 	if (paused && curScreen === null && g) {
 		draw(ctx, viewW, viewH);
 		ctx.fillStyle = "rgba(0,0,0,0.4)";
@@ -9433,10 +9445,10 @@ function loop(now) {
 // Tutorial resets every session
 let _tutorialDone = false;
 buildPadGrid();
-$("skip-tut-btn").onclick = () => {
+bindClick("skip-tut-btn", () => {
 	_tutorialDone = true;
 	updateSkipTutBtn();
 	SFX.sel();
-};
+});
 showScreen("menu-screen");
 requestAnimationFrame(loop);

@@ -1081,9 +1081,29 @@ function fadeMenuMusicTo(target, durationMs) {
 
 function playMenuMusicIfAllowed() {
 	const m = ensureMenuMusic();
-	if (!menuMusicUnlocked) return;
+	m.muted = false;
 	const p = m.play();
-	if (p && typeof p.catch === "function") p.catch(() => {});
+	if (p && typeof p.then === "function") {
+		p.then(() => {
+			menuMusicUnlocked = true;
+		}).catch(() => {});
+	}
+}
+
+function primeMenuMusicAutoplay() {
+	const m = ensureMenuMusic();
+	m.muted = true;
+	const p = m.play();
+	if (p && typeof p.then === "function") {
+		p.then(() => {
+			if (curScreen !== null) {
+				m.muted = false;
+				fadeMenuMusicTo(MENU_MUSIC_VOL, 250);
+			} else {
+				m.pause();
+			}
+		}).catch(() => {});
+	}
 }
 
 function syncMenuMusicForScreen(nextScreen, prevScreen) {
@@ -1099,6 +1119,7 @@ function syncMenuMusicForScreen(nextScreen, prevScreen) {
 
 function unlockMenuMusic() {
 	menuMusicUnlocked = true;
+	ensureMenuMusic().muted = false;
 	syncMenuMusicForScreen(curScreen, null);
 }
 
@@ -8098,6 +8119,9 @@ function showScreen(id) {
 	syncMenuMusicForScreen(id, prevScreen);
 	// Auto-start card physics for the menu (pad-grid is pre-built)
 	if (id === "menu-screen") {
+		// Reinforce music on the main menu to avoid transition race conditions.
+		playMenuMusicIfAllowed();
+		fadeMenuMusicTo(MENU_MUSIC_VOL, prevScreen === null ? MENU_MUSIC_FADE_IN_MS : 350);
 		initCardPhysics($("pad-grid"));
 		updateSkipTutBtn();
 	}
@@ -9527,4 +9551,5 @@ bindClick("skip-tut-btn", () => {
 	SFX.sel();
 });
 showScreen("menu-screen");
+primeMenuMusicAutoplay();
 requestAnimationFrame(loop);

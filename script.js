@@ -100,7 +100,7 @@ const DIFF_RANKS = ["F", "E", "D", "C", "B", "A", "S", "SS", "SSS"];
 const DIFF_COLORS = {
 	F: "#446644",
 	"F-": "#8c8c8c",
-	©: "#e6dcff",
+	"ï¿½": "#e6dcff",
 	E: "#558855",
 	D: "#669966",
 	C: "#88aa88",
@@ -113,7 +113,7 @@ const DIFF_COLORS = {
 const DIFF_GLOW = {
 	F: "68,102,68",
 	"F-": "140,140,140",
-	©: "230,220,255",
+	"ï¿½": "230,220,255",
 	E: "85,136,85",
 	D: "102,153,102",
 	C: "136,170,136",
@@ -127,7 +127,7 @@ const DIFF_GLOW = {
 const DIFF_REWARD = {
 	F: "common",
 	"F-": "common",
-	©: "klein",
+	"ï¿½": "klein",
 	E: "common",
 	D: "uncommon",
 	C: "uncommon",
@@ -149,7 +149,7 @@ const DIFF_TIERS = {
 	S: ["epic", "legendary", "mythical"],
 	SS: ["legendary", "mythical", "secret"],
 	SSS: ["legendary", "mythical", "secret", "klein"],
-	©: ["mythical", "secret", "klein"],
+	"ï¿½": ["mythical", "secret", "klein"],
 };
 const DIFF_BALL_MUL = {
 	"F-": 1.18,
@@ -162,7 +162,7 @@ const DIFF_BALL_MUL = {
 	S: 1.92,
 	SS: 2.08,
 	SSS: 2.22,
-	©: 2.38,
+	"ï¿½": 2.38,
 };
 const BASE_BALL_SPEED_CAP = 760;
 const FOOL_SEQUENCES = [
@@ -825,7 +825,7 @@ const ENEMIES = [
 	{
 		id: "thefool",
 		name: "THE FOOL",
-		tag: "<Ï",
+		tag: "<ï¿½",
 		diff: "F-",
 		mod: (c) => {
 			c.aiSpd = 220;
@@ -2913,7 +2913,7 @@ function saveGame(g) {
 function isKleinLossState(g) {
 	if (!g || g.result !== "lose") return false;
 	return (
-		g.cfg?.diff === "©" || (g.cfg?.enemy?.id === "thefool" && g.foolNearGod)
+		g.cfg?.diff === "ï¿½" || (g.cfg?.enemy?.id === "thefool" && g.foolNearGod)
 	);
 }
 
@@ -3593,7 +3593,7 @@ function update(dt) {
 		if (g._paradoxTick <= 0) {
 			g._paradoxTick = 0.5;
 			const spd = Math.hypot(g.bvx, g.bvy);
-			const ang = (Math.random() - 0.5) * 1.2; // ±0.6 radians
+			const ang = (Math.random() - 0.5) * 1.2; // ï¿½0.6 radians
 			g.bvx = Math.abs(Math.cos(ang)) * spd;
 			g.bvy = Math.sin(ang) * spd;
 		}
@@ -7288,7 +7288,7 @@ function draw(ctx, cw, ch) {
 			ctx.textBaseline = "top";
 			ctx.shadowColor = "rgba(255,60,60,0.8)";
 			ctx.shadowBlur = 10;
-			ctx.fillText("  ENEMY " + (g._eAbilFlashName || "ABILITY") + "  ", GW / 2, 8);
+			ctx.fillText("ï¿½ ENEMY " + (g._eAbilFlashName || "ABILITY") + " ï¿½", GW / 2, 8);
 			ctx.shadowBlur = 0;
 			ctx.globalAlpha = 1;
 		}
@@ -7392,7 +7392,7 @@ function draw(ctx, cw, ch) {
 			const pulse = 0.6 + 0.4 * Math.sin(g.t * 4);
 			ctx.globalAlpha = pulse;
 			ctx.fillStyle = "#ff2244";
-			ctx.fillText("È NULL ACTIVE È", GW / 2, GH - 18);
+			ctx.fillText("ï¿½ NULL ACTIVE ï¿½", GW / 2, GH - 18);
 		} else {
 			const cd = Math.ceil(g._nullCooldownT);
 			ctx.globalAlpha = 0.4;
@@ -9198,7 +9198,7 @@ window.showDevScreen = function showDevScreen() {
 			const th = document.createElement("div");
 			th.style.cssText = `margin-top:8px;padding:8px 8px 3px;border-top:1px solid rgba(120,120,140,0.3);font-size:11px;font-weight:900;letter-spacing:4px;text-align:left;color:${tc2};text-shadow:0 0 10px rgba(${TIER_GLOW[c.tier] || "140,140,140"},0.45);`;
 			th.textContent =
-				(TIER_ICON[c.tier] || "Ç") +
+				(TIER_ICON[c.tier] || "ï¿½") +
 				" " +
 				(TIER_NAMES[c.tier] || c.tier.toUpperCase());
 			abList.appendChild(th);
@@ -9207,7 +9207,7 @@ window.showDevScreen = function showDevScreen() {
 		const tc = TIER_COLORS[c.tier] || "#aaa";
 		const row = document.createElement("div");
 		row.style.cssText = `padding:9px 10px;cursor:pointer;border:1px solid ${sel ? tc : "#3a3a46"};border-radius:4px;background:${sel ? "rgba(255,255,255,0.06)" : "#050508"};display:flex;justify-content:space-between;align-items:center;gap:10px;box-shadow:${sel ? `0 0 0 1px ${tc}66` : "0 0 0 1px rgba(255,255,255,0.03) inset"};`;
-		row.innerHTML = `<div style="display:flex;flex-direction:column;align-items:flex-start;"><div style="font-size:10px;letter-spacing:2px;color:${sel ? "#eee" : "#ccc"};">${c.name}</div><div style="font-size:9px;letter-spacing:1px;color:${sel ? "#ddd" : "#aaa"};">${c.desc}</div></div><div style="font-size:12px;color:${tc};">${sel ? "Ï" : "Ë"}</div>`;
+		row.innerHTML = `<div style="display:flex;flex-direction:column;align-items:flex-start;"><div style="font-size:10px;letter-spacing:2px;color:${sel ? "#eee" : "#ccc"};">${c.name}</div><div style="font-size:9px;letter-spacing:1px;color:${sel ? "#ddd" : "#aaa"};">${c.desc}</div></div><div style="font-size:12px;color:${tc};">${sel ? "ï¿½" : "ï¿½"}</div>`;
 		row.onclick = () => {
 			devAbilityScrollTop = abList.scrollTop;
 			devScreenScrollTop = devScreenEl

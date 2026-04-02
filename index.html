@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PADDLEBORN</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="crt-scan"></div><div id="crt-edge"></div>
+<canvas id="cv"></canvas>
+
+<div id="menu-screen" class="screen">
+  <div style="text-align:center;max-width:920px;padding:0 20px;">
+    <div style="margin-bottom:28px;"><div class="title">PADDLE</div><div class="subtitle">BORN</div></div>
+    <div class="slabel">CHOOSE YOUR PADDLE</div>
+    <div class="pad-grid" id="pad-grid"></div>
+    <div class="dim" style="margin-top:22px;">W/S MOVE &middot; A/D SHIFT &middot; Q ABILITY &middot; FIRST TO 5 &middot; 12 WAVES &middot; ENEMY UPGRADES TOO</div>
+    <div id="skip-tut-btn" style="margin-top:10px;cursor:pointer;color:#aab;font-size:11px;letter-spacing:4px;padding:6px 16px;border:1px solid #444;border-radius:3px;display:inline-block;transition:all 0.2s;" onmouseenter="this.style.color='#fff';this.style.borderColor='#888';this.style.textShadow='0 0 8px rgba(255,255,255,0.2)'" onmouseleave="this.style.color='#aab';this.style.borderColor='#444';this.style.textShadow='none'">SKIP TUTORIAL</div>
+    <div id="dev-btn" style="margin-top:18px;cursor:pointer;display:inline-block;padding:8px 20px;border:1px solid #555;border-radius:3px;color:#fff;font-size:11px;letter-spacing:4px;background:linear-gradient(175deg,#111,#080808);transition:all 0.22s ease;" onmouseenter="this.style.borderColor='#aaa';this.style.background='linear-gradient(175deg,#222,#111)';this.style.boxShadow='0 0 20px rgba(255,255,255,0.08)'" onmouseleave="this.style.borderColor='#555';this.style.background='linear-gradient(175deg,#111,#080808)';this.style.boxShadow='none'" onclick="SFX.sel();showDevScreen();">&#9881; SANDBOX MODE</div>
+  </div>
+</div>
+
+<div id="cards-screen" class="screen hidden">
+  <div style="text-align:center;max-width:760px;padding:0 16px;">
+    <div style="color:#fff;font-size:14px;letter-spacing:6px;margin-bottom:6px;">WAVE CLEAR</div>
+    <div id="upgrade-title" style="font-size:clamp(24px,4vw,34px);letter-spacing:10px;margin-bottom:6px;text-shadow:0 0 18px rgba(255,255,255,0.18);">SELECT YOUR REWARD</div>
+    <div id="upgrade-explain" style="color:#b0b2c0;font-size:13px;letter-spacing:2px;margin-bottom:10px;"></div>
+    <div id="rank-display"></div>
+    <div id="diff-display" style="margin:4px 0;"></div>
+    <div id="e-warn-box"></div>
+    <div id="next-wave-info" style="color:#fff;font-size:11px;letter-spacing:2px;margin:10px 0 18px;"></div>
+    <div class="card-grid" id="card-grid"></div>
+  </div>
+</div>
+
+<div id="go-screen" class="screen hidden">
+  <div style="text-align:center;max-width:420px;">
+    <div class="go-title">GAME<br>OVER</div>
+    <div id="go-info" style="color:#fff;font-size:13px;letter-spacing:3px;margin-bottom:6px;"></div>
+    <div id="go-buffs" style="color:#ffe0e0;font-size:11px;margin-bottom:14px;"></div>
+    <div class="go-stats" id="go-stats"></div>
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:center;margin-top:18px;">
+      <div class="btn" id="go-retry">RETRY</div>
+      <div class="btn sec" id="go-menu">CHANGE PADDLE</div>
+    </div>
+  </div>
+</div>
+
+<div id="vic-screen" class="screen hidden">
+  <div style="text-align:center;position:relative;">
+    <div class="vic-rays" id="vic-rays"></div>
+    <div class="vic-sub" id="vic-sub">12 WAVES CLEARED</div>
+    <div id="vic-title" class="vic-title-text">VICTORY</div>
+    <div id="vic-info" style="color:#fff;font-size:13px;letter-spacing:3px;margin-bottom:14px;"></div>
+    <div class="vic-stats" id="vic-stats"></div>
+    <div class="btn" id="vic-again" style="margin-top:18px;">PLAY AGAIN</div>
+  </div>
+</div>
+
+<div id="opp-screen" class="screen hidden">
+  <div style="text-align:center;max-width:920px;padding:0 16px;">
+    <div style="color:#fff;font-size:11px;letter-spacing:6px;margin-bottom:6px;">WAVE <span id="opp-wave-num"></span></div>
+    <div style="font-size:clamp(22px,4vw,32px);letter-spacing:10px;margin-bottom:4px;text-shadow:0 0 18px rgba(255,255,255,0.18);">CHOOSE OPPONENT</div>
+    <div id="opp-enemy-warn" style="margin:6px 0;"></div>
+    <div style="color:#fff;font-size:11px;letter-spacing:3px;margin:4px 0 18px;">harder fights, better loot</div>
+    <div class="opp-grid" id="opp-grid"></div>
+    <div style="color:#fff;font-size:10px;letter-spacing:2px;margin-top:22px;">RISK MORE &middot; EARN MORE</div>
+  </div>
+</div>
+
+<div id="dev-screen" class="screen hidden">
+  <div class="dev-shell">
+    <div style="font-size:clamp(28px,5vw,42px);letter-spacing:12px;margin-bottom:4px;text-shadow:0 0 18px rgba(255,100,100,0.18);">SANDBOX MODE</div>
+    <div style="color:#ddd;font-size:14px;letter-spacing:5px;margin-bottom:16px;">TEST ANY PADDLE vs ANY ENEMY</div>
+    <div class="dev-columns">
+      <div class="dev-col">
+        <div class="dev-head">PADDLES</div>
+        <div id="dev-pad-grid" class="dev-scroll-box"></div>
+      </div>
+      <div class="dev-col">
+        <div class="dev-head">ABILITIES</div>
+        <div id="dev-enemy-grid" class="dev-scroll-box"></div>
+      </div>
+      <div class="dev-col">
+        <div class="dev-head">ENEMIES / STAGE-WAVE</div>
+        <div id="dev-opts" class="dev-scroll-box"></div>
+        <div class="btn" id="dev-go" style="margin-top:16px;width:100%;">LAUNCH TEST</div>
+        <div class="btn sec" id="dev-back" style="margin-top:6px;width:100%;">BACK</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pause-overlay" class="hidden" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:rgba(0,0,0,0.5);">
+  <div style="text-align:center;">
+    <div style="color:#fff;font-size:clamp(28px,5vw,40px);letter-spacing:10px;font-weight:700;text-shadow:0 0 10px rgba(0,0,0,0.8);margin-bottom:22px;font-family:'Share Tech Mono',monospace;">PAUSED</div>
+    <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+      <div class="btn" id="pause-resume" style="min-width:180px;">RESUME</div>
+      <div class="btn sec" id="pause-menu" style="min-width:180px;">BACK TO MENU</div>
+      <div class="btn sec" id="pause-skip-tut" style="min-width:180px;display:none;color:#ff8888;border-color:#663333;">SKIP TUTORIAL</div>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

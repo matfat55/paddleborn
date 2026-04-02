@@ -1032,6 +1032,80 @@ const SFX = {
 	},
 };
 
+const MENU_MUSIC_SRC = "8 Bit Menu - David Renda.mp3";
+const MENU_MUSIC_VOL = 0.42;
+const MENU_MUSIC_FADE_IN_MS = 1000;
+const MENU_MUSIC_FADE_OUT_MS = 500;
+let menuMusic = null;
+let menuMusicFadeRaf = 0;
+let menuMusicUnlocked = false;
+
+function ensureMenuMusic() {
+	if (menuMusic) return menuMusic;
+	menuMusic = new Audio(MENU_MUSIC_SRC);
+	menuMusic.loop = true;
+	menuMusic.preload = "auto";
+	menuMusic.volume = 0;
+	return menuMusic;
+}
+
+function stopMenuMusicFade() {
+	if (!menuMusicFadeRaf) return;
+	cancelAnimationFrame(menuMusicFadeRaf);
+	menuMusicFadeRaf = 0;
+}
+
+function fadeMenuMusicTo(target, durationMs) {
+	const m = ensureMenuMusic();
+	stopMenuMusicFade();
+	const startVol = m.volume;
+	const start = performance.now();
+	const dur = Math.max(1, durationMs || 1);
+
+	const tick = (now) => {
+		const t = Math.min((now - start) / dur, 1);
+		m.volume = startVol + (target - startVol) * t;
+		if (t < 1) {
+			menuMusicFadeRaf = requestAnimationFrame(tick);
+			return;
+		}
+		menuMusicFadeRaf = 0;
+		if (target <= 0.001) {
+			m.volume = 0;
+			m.pause();
+		}
+	};
+
+	menuMusicFadeRaf = requestAnimationFrame(tick);
+}
+
+function playMenuMusicIfAllowed() {
+	const m = ensureMenuMusic();
+	if (!menuMusicUnlocked) return;
+	const p = m.play();
+	if (p && typeof p.catch === "function") p.catch(() => {});
+}
+
+function syncMenuMusicForScreen(nextScreen, prevScreen) {
+	const inGameplay = nextScreen === null;
+	if (inGameplay) {
+		fadeMenuMusicTo(0, MENU_MUSIC_FADE_OUT_MS);
+		return;
+	}
+	playMenuMusicIfAllowed();
+	const fromMatch = prevScreen === null;
+	fadeMenuMusicTo(MENU_MUSIC_VOL, fromMatch ? MENU_MUSIC_FADE_IN_MS : 350);
+}
+
+function unlockMenuMusic() {
+	menuMusicUnlocked = true;
+	syncMenuMusicForScreen(curScreen, null);
+}
+
+["pointerdown", "keydown", "touchstart"].forEach((evt) => {
+	window.addEventListener(evt, unlockMenuMusic, { once: true });
+});
+
 
 function foolStageToKey(stage) {
 	return (
@@ -8005,6 +8079,7 @@ function draw(ctx, cw, ch) {
 // --- SCREEN MANAGEMENT ---
 const $ = (id) => document.getElementById(id);
 function showScreen(id) {
+	const prevScreen = curScreen;
 	stopCardPhysics();
 	$("pause-overlay").classList.add("hidden");
 	paused = false;
@@ -8020,6 +8095,7 @@ function showScreen(id) {
 	});
 	$("cv").style.display = id === null ? "block" : "none";
 	curScreen = id;
+	syncMenuMusicForScreen(id, prevScreen);
 	// Auto-start card physics for the menu (pad-grid is pre-built)
 	if (id === "menu-screen") {
 		initCardPhysics($("pad-grid"));
